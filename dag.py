@@ -10,6 +10,7 @@ PORT = '8080'
 WEB_FOLDER = "web"
 
 def main():
+    """The main function... I know, shocker, right!?"""
 
     dest = (Path(__file__).parent / WEB_FOLDER).resolve()
     print(f"Serving files from {dest}")
