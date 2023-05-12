@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dag</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.0/css/bootstrap.min.css"
+        integrity="sha512-XWTTruHZEYJsxV3W/lSXG1n3Q39YIWOstqvmFsdNEEQfHoZ6vm6E9GK2OrF6DSJSpIbRbi+Nn0WDPID9O7xB2Q=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+    <script src="https://unpkg.com/d3@7.8.4"></script>
+    <script src="https://unpkg.com/d3-sankey@0.12.3"></script>
+    <style>
+        #chart {
+            height: 500px;
+            width: 700px;
+            border: 1px solid #ccc;
+            padding: 0.5em;
+            margin-bottom: 0.5em;
+        }
+    </style>
+</head>
+<body>
+    <div id="chart"></div>
+
+    <textarea id="inputText" rows="15" cols="80">
+A > B
+B > C
+C > D
+    </textarea>
+
+    <script>
+        const svg = d3.select("#chart").append("svg").attr("width", 700).attr("height", 500);
+        const sankey = d3.sankey()
+            .nodeId(d => d.name)
+            .nodeAlign(d3.sankeyRight)
+            .nodeSort(null)
+            .nodeWidth(15)
+            .nodePadding(10)
+            .extent([[5, 5], [700 - 5, 500 - 5]]);
+        const path = d3.sankeyLinkHorizontal();
+
+        const updateChart = () => {
+            const inputText = document.getElementById('inputText').value;
+            const lines = inputText.split('\n');
+            let nodes = {};
+            const links = lines
+                .filter(line => line.includes('>'))
+                .map(line => {
+                    const parts = line.split('>');
+                    return {source: parts[0].trim(), target: parts[1].trim(), value: 1};
+                });
+
+            links.forEach(link => {
+                link.source = nodes[link.source] || (nodes[link.source] = { name: link.source });
+                link.target = nodes[link.target] || (nodes[link.target] = { name: link.target });
+            });
+
+            const graph = {
+                nodes: Object.values(nodes), 
+                links: links
+            };
+            sankey(graph);
+
+            svg.selectAll('*').remove();
+
+            const link = svg.append("g").selectAll(".link")
+                .data(graph.links)
+                .enter().append("path")
+                .attr("class", "link")
+                .attr("d", path)
+                .style("stroke-width", d => Math.max(1, d.width));
+
+            const node = svg.append("g").selectAll(".node")
+                .data(graph.nodes)
+                .enter().append("g")
+                .attr("class", "node")
+                .attr("transform", d => "translate(" + d.x0 + "," + d.y0 + ")");
+
+            node.append("rect")
+                .attr("height", d => d.y1 - d.y0)
+                .attr("width", d => d.x1 - d.x0)
+                .style("fill", d => d.color = d3.scaleOrdinal(d3.schemeCategory10)(d.name.replace(/ .*/, "")))
+                .style("stroke", d => d3.rgb(d.color).darker(2));
+        }
+
+        document.getElementById('inputText').addEventListener('input', updateChart);
+        updateChart();
+    </script>
+</body>
+</html>
