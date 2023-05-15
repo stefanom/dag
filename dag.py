@@ -19,6 +19,10 @@ def main():
     def serve_index():
         return bottle.static_file('index.html', root=dest)
 
+    @bottle.route('/<filename:path>')
+    def serve_static(filename):
+        return bottle.static_file(filename, root=str(dest))
+
     bottle.run(host=HOST, port=PORT)
 
 if __name__ == '__main__':

@@ -1,0 +1,15 @@
+#chart {
+    border: 1px solid #ccc;
+    padding: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+#inputText {
+    width: 98vw;
+    border: 1px solid #ccc;
+}
+
+.label {
+    font-family: Helvetica, sans-serif;
+    font-size: 0.9rem;
+}
