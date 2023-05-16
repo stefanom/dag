@@ -1,10 +1,18 @@
+import * as d3 from 'd3';
+import * as d3Sankey from 'd3-sankey-circular';
+import * as marked from 'marked';
+import { createGraph, getDagEdges } from './utils';
+
+import 'bulma/bulma.sass';
+import './dag.css';
+
 const width = window.innerWidth;
 const height = 800;
 const padding = 5;
 const nodeWidth = 10;
 const nodePadding = 10;
 const nodeLabelPadding = 6;
-const alignment = d3.sankeyRight;
+const alignment = d3Sankey.sankeyRight;
 
 marked.use({
     async: false,
@@ -21,12 +29,11 @@ const sankeyPlot = d3.select("#chart")
         .attr("viewBox", [0, 0, width, height])
         .attr("style", "max-width: 100%; height: auto; height: intrinsic;");        
 
-const sankey = d3.sankey()
+const sankey = d3Sankey.sankeyCircular()
     .nodeId(d => d.name)
     .nodeAlign(alignment)
     .nodeWidth(nodeWidth)
     .nodePadding(nodePadding)
-    .nodeSort(null)
     .extent([[padding, padding], [width - padding, height - padding]]);
     
 function updateChart() {
@@ -50,7 +57,7 @@ function updateChart() {
         .data(graph.links)
         .enter().append("path")
             .attr("class", "link")
-            .attr("d", d3.sankeyLinkHorizontal())
+            .attr("d", d3_sankey.sankeyLinkHorizontal())
             .style("stroke-width", d => Math.max(1, d.width));
 
     const node = sankeyPlot.append("g").selectAll(".node")

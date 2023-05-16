@@ -1,3 +1,5 @@
+import * as graphology from 'graphology';
+
 /**
  * Gets the median of an array of numeric values.
  * 
@@ -36,7 +38,7 @@ function median(values) {
  * @param {str} text 
  * @returns 
  */
-function getDagEdges(text) {
+export function getDagEdges(text) {
 
     let lines = text.split('\n');
     let results = [];
@@ -83,27 +85,14 @@ function getDagEdges(text) {
 
         if (effort) {
             result.metadata.effort = parseInt(effort, 10);
-            result.metadata.value = effort;
         }
 
-        if (effort && uncertainty) {
+        if (uncertainty) {
             result.metadata.uncertainty = parseFloat(uncertainty);
-            result.metadata.value += result.metadata.value * result.metadata.uncertainty;
         }
 
         results.push(result);
     }
-
-    // Get the median of the local values from the results that have it.
-    let values = results.filter(obj => obj.metadata.hasOwnProperty('value')).map(obj => obj.metadata.value);
-    let medianValue = median(values);
-
-    // Update objects that do not have it with the median.
-    results.forEach(obj => {
-        if (!obj.metadata.hasOwnProperty('value')) {
-            obj.metadata.value = medianValue;
-        }
-    });
 
     return results;
 }
@@ -122,28 +111,66 @@ function getDagEdges(text) {
  * @param {array of objects} edges 
  * @returns 
  */
-function createGraph(links) {
+export function createGraph(links) {
+    // Update objects that do not have it with the median.
+    links.forEach(link => {
+        if (link.metadata.hasOwnProperty('effort')) {
+            link.metadata.mass = link.metadata.effort;
+        }
+        if (link.metadata.hasOwnProperty('uncertainty')) {
+            link.metadata.mass += link.metadata.effort * link.metadata.uncertainty;
+        }
+    });
+
+    // Get the median of the local values from the results that have it.
+    let masses = links.filter(link => link.metadata.hasOwnProperty('mass')).map(link => link.metadata.mass);
+    let medianMass = median(masses);
+
+    // Update objects that do not have mass with the median from all the tasks.
+    links.forEach(link => {
+        if (!link.metadata.hasOwnProperty('mass')) {
+            link.metadata.mass = medianMass;
+        }
+    });
+
     console.log(JSON.stringify(links, null, 2));
 
-    var graph = new graphlib.Graph();
-    var metadata = {};
+    // Create a Graphology graph to help us with graph theory stuff.
+    let graph = new graphology.Graph();
     links.forEach(link => {
-        graph.setEdge(link.source, link.target);
-        metadata[link.source + link.target] = link.metadata;
+        if (!graph.hasNode(link.source)) {
+            graph.addNode(link.source, link.metadata);
+        }
+        if (!graph.hasNode(link.target)) {
+            graph.addNode(link.source);
+        }
+        graph.addEdge(link.source, link.target);
+    });
+
+    // Bail if the graph has cycles.
+    if (!graphlib.alg.isAcyclic(graph)) {
+        throw new Error("The graph has cycles so it can't be visualized as a Sankey diagrams.");
+    }
+
+    console.log(JSON.stringify(graphlib.json.write(graph), null, 2));
+
+    // Decorate nodes with the mass of their children
+    console.log(graph.nodes());
+    let topsort = graphlib.alg.topsort(graph);
+    topsort.forEach(node => {
+        console.log(node);
+        console.log(graph.node(node));
+        console.log(graph.children(node));
+
+        ///////////////// continue here ///////////////////
     });
 
     let nodes = {};
     links.forEach(link => {
         link.source = nodes[link.source] || (nodes[link.source] = { name: link.source });
         link.target = nodes[link.target] || (nodes[link.target] = { name: link.target });
-        link.value = link.metadata.value;
+        link.value = link.metadata.mass + link.metadata.childrenMass
     });
-
-    console.log(graph);
-    console.log(graph.nodes());
-    console.log(graph.edges());
-    console.log(metadata);
-    console.log(links);
 
     return {
          nodes: Object.values(nodes),

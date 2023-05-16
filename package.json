@@ -1,0 +1,39 @@
+{
+  "name": "dag",
+  "version": "1.0.0",
+  "description": "Dag is a tool for thought (tft) that helps you think of dependency maps.",
+  "private": true,
+  "scripts": {
+    "dev": "webpack serve --mode development",
+    "release": "webpack --mode production",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stefanom/dag.git"
+  },
+  "author": "Stefano Mazzocchi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stefanom/dag/issues"
+  },
+  "homepage": "https://github.com/stefanom/dag#readme",
+  "dependencies": {
+    "bulma": "^0.9.4",
+    "d3": "^7.8.4",
+    "d3-sankey-circular": "^0.34.0",
+    "graphology": "^0.25.1",
+    "graphology-dag": "^0.2.0",
+    "marked": "^5.0.2"
+  },
+  "devDependencies": {
+    "css-loader": "^6.7.3",
+    "html-webpack-plugin": "^5.5.1",
+    "sass": "^1.62.1",
+    "sass-loader": "^13.2.2",
+    "style-loader": "^3.3.2",
+    "webpack": "^5.82.1",
+    "webpack-cli": "^5.1.1",
+    "webpack-dev-server": "^4.15.0"
+  }
+}
