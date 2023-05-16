@@ -1,24 +1,57 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Dag</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="dag.css">
-    <script src="https://unpkg.com/d3@7.8.4"></script>
-    <script src="https://unpkg.com/d3-sankey@0.12.3"></script>
+  <title>Dag</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://unpkg.com/bulma@0.9.3/css/bulma.min.css">
+  <link rel="stylesheet" type="text/css" href="dag.css">
+  <script src="https://unpkg.com/d3@7.8.4/dist/d3.min.js"></script>
+  <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+  <script src="https://unpkg.com/marked@5.0.2/lib/marked.umd.js"></script>
+  <script src="https://unpkg.com/graphlib@2.1.8/dist/graphlib.min.js"></script>
+  <script src="utils.js"></script>
 </head>
+
 <body>
-    <div id="chart"></div>
-    <textarea id="inputText" rows="20">
-this > that
-this > also that
-this > something else
-that > and this thing also
-something else > oh, we forgot this
-oh, we forgot this > and this
-and this > and, also this
-    </textarea>
+  <section class="hero is-fullheight is-fluid">
+    <header class="header">
+      <h1 id="title" class="title">Dag 🚀</h1>
+    </header>
+
+    <div class="container is-fluid">
+      <div class="block">
+        <div id="chart"></div>
+      </div>
+      <div class="columns">
+        <div class="column is-two-thirds">
+          <p class="is-small">Type below to see the diagram change &not;
+            <textarea id="inputText" class="textarea is-fluid is-family-monospace" rows="20"
+              placeholder="Type your dag here">
+This is an example dag
+
+* A > B [1|0.5]
+* B > C [2]
+* C > D
+* B > F [3]
+* F > Z [4|1]
+          </textarea>
+        </div>
+        <div class="column">
+          <div id="markdown" class="content is-small"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer has-text-centered is-flex-align-items-flex-end mt-auto">
+      <p><strong>Dag 🚀</strong> is open source software written by <a href="https://linotype.substack.com/">Stefano
+          Mazzocchi</a>.
+        You can find it on <a href="https://github.com/stefanom/dag">GitHub</a>.</p>
+    </footer>
+    </div>
+
     <script src="dag.js"></script>
 </body>
+
 </html>

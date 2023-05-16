@@ -6,7 +6,15 @@ const nodePadding = 10;
 const nodeLabelPadding = 6;
 const alignment = d3.sankeyRight;
 
-const svg = d3.select("#chart")
+marked.use({
+    async: false,
+    pedantic: false,
+    mangle: false,
+    headerIds: false,
+    gfm: true,
+});
+
+const sankeyPlot = d3.select("#chart")
     .append("svg")
         .attr("width", width)
         .attr("height", height)
@@ -22,37 +30,19 @@ const sankey = d3.sankey()
     .extent([[padding, padding], [width - padding, height - padding]]);
     
 function updateChart() {
-    let nodes = {};
-
     const inputText = document.getElementById('inputText').value;
-    const lines = inputText.split('\n');
-    const links = lines
-        .filter(line => line.includes('>'))
-        .map(line => {
-            const parts = line.split('>');
-            return {
-                source: parts[1].trim(), 
-                target: parts[0].trim(), 
-                value: 1
-            };
-        });
 
-    links.forEach(link => {
-        link.source = nodes[link.source] || (nodes[link.source] = { name: link.source });
-        link.target = nodes[link.target] || (nodes[link.target] = { name: link.target });
-    });
+    // First make sure it's valid markdown and render it
+    document.getElementById('markdown').innerHTML = marked.parse(inputText);
 
-    const graph = {
-        nodes: Object.values(nodes), 
-        links: links
-    };
+    // Then, let's extract the dag from it
+    const graph = createGraph(getDagEdges(inputText));
+
     sankey(graph);
 
-    // console.log(graph);
+    sankeyPlot.selectAll('*').remove();
 
-    svg.selectAll('*').remove();
-
-    const link = svg.append("g")
+    sankeyPlot.append("g")
             .attr("fill", "none")
             .attr("stroke", "#000")
             .attr("stroke-opacity", 0.2)
@@ -63,7 +53,7 @@ function updateChart() {
             .attr("d", d3.sankeyLinkHorizontal())
             .style("stroke-width", d => Math.max(1, d.width));
 
-    const node = svg.append("g").selectAll(".node")
+    const node = sankeyPlot.append("g").selectAll(".node")
         .data(graph.nodes)
         .enter().append("g")
             .attr("class", "node")

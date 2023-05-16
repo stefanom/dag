@@ -5,11 +5,28 @@
 }
 
 #inputText {
-    width: 98vw;
     border: 1px solid #ccc;
+}
+
+.title {
+    font-size: 1.5rem;
 }
 
 .label {
     font-family: Helvetica, sans-serif;
     font-size: 0.9rem;
+}
+
+.container.is-fluid, .section, .footer {
+    padding: 1rem;
+}
+
+.header {
+    padding-top: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.footer {
+    border-top: 1px solid #ddd;
 }
