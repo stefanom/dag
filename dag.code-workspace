@@ -4,5 +4,9 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"[html]": {
+			"editor.tabSize": 2
+		}		
+	}
 }
