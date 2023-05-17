@@ -72,8 +72,8 @@ Make sure you have `node.js` installed, then type:
 
 > npm run dev
 
-then point your browser to http://127.0.0.1:8080/ to interact with it. If you
-make any changes in the `./dev` folder the page will be autoreloaded.
+which will automatically open your browser to the right page. If you
+make any changes in the `./dev` folder the page reload automagically.
 
 ## How do I package it for release?
 
