@@ -1,9 +1,11 @@
+import { now } from 'd3';
 import * as graphology from 'graphology';
+import { hasCycle, topologicalSort } from 'graphology-dag';
 
 /**
  * Gets the median of an array of numeric values.
  * 
- * @param {array[numbers]} values 
+ * @param {array[number]} values 
  * @returns the median 
  */
 function median(values) {
@@ -98,82 +100,95 @@ export function getDagEdges(text) {
 }
 
 /**
- * Create a Graphlib graph from an array of objects of the form:
+ * Create a graph from an array of objects of the form:
  * 
  * {
- *  'source': <str>,
- *  'target': <str>,
- *  'effort': <int>,
- *  'uncertainty': <float>,
- *  'localValue':
+ *   'source': <str>,
+ *   'target': <str>,
+ *   'metadata': {
+ *     'effort': <int>,
+ *     'uncertainty': <float>,
+ *   }
  * }
  * 
- * @param {array of objects} edges 
+ * @param {array[object]} links 
  * @returns 
  */
 export function createGraph(links) {
-    // Update objects that do not have it with the median.
-    links.forEach(link => {
-        if (link.metadata.hasOwnProperty('effort')) {
-            link.metadata.mass = link.metadata.effort;
-        }
-        if (link.metadata.hasOwnProperty('uncertainty')) {
-            link.metadata.mass += link.metadata.effort * link.metadata.uncertainty;
-        }
-    });
-
-    // Get the median of the local values from the results that have it.
-    let masses = links.filter(link => link.metadata.hasOwnProperty('mass')).map(link => link.metadata.mass);
-    let medianMass = median(masses);
-
-    // Update objects that do not have mass with the median from all the tasks.
-    links.forEach(link => {
-        if (!link.metadata.hasOwnProperty('mass')) {
-            link.metadata.mass = medianMass;
-        }
-    });
-
-    console.log(JSON.stringify(links, null, 2));
-
-    // Create a Graphology graph to help us with graph theory stuff.
     let graph = new graphology.Graph();
+
+    // Create the graph from links.
+    let masses = [];
     links.forEach(link => {
-        if (!graph.hasNode(link.source)) {
-            graph.addNode(link.source, link.metadata);
+        let source = link.source;
+        let target = link.target;
+        let metadata = link.metadata;
+
+        if (metadata.hasOwnProperty('effort')) {
+            metadata.ownMass = metadata.effort;
+            if (metadata.hasOwnProperty('uncertainty')) {
+                metadata.ownMass += metadata.effort * metadata.uncertainty;
+            } else {
+                metadata.uncertainty = 0;
+            }
+            masses.push(metadata.ownMass);
         }
-        if (!graph.hasNode(link.target)) {
-            graph.addNode(link.source);
+
+        if (!graph.hasNode(source)) {
+            graph.addNode(source, metadata);
         }
-        graph.addEdge(link.source, link.target);
+        if (!graph.hasNode(target)) {
+            graph.addNode(target);
+        }
+        graph.addEdge(source, target);
     });
 
     // Bail if the graph has cycles.
-    if (!graphlib.alg.isAcyclic(graph)) {
-        throw new Error("The graph has cycles so it can't be visualized as a Sankey diagrams.");
+    if (hasCycle(graph)) {
+        throw new Error("The graph has cycles.");
     }
+    
+    // It is expected that some of the nodes will not have any metadata
+    // associated to them so at the very least we need to find an effort
+    // which we will default to be the the median of the mass of all the
+    // other tasks that have it.
+    let medianMass = median(masses) || 1;
 
-    console.log(JSON.stringify(graphlib.json.write(graph), null, 2));
-
-    // Decorate nodes with the mass of their children
-    console.log(graph.nodes());
-    let topsort = graphlib.alg.topsort(graph);
-    topsort.forEach(node => {
-        console.log(node);
-        console.log(graph.node(node));
-        console.log(graph.children(node));
-
-        ///////////////// continue here ///////////////////
+    // Update objects that do not have mass with the median mass of all the tasks.
+    graph.forEachNode((node, attributes) => {
+        if (!attributes.ownMass) {
+            attributes.ownMass = medianMass;
+        }
     });
 
+    // Iterate over nodes sorted topologically
+    topologicalSort(graph).forEach(node => {
+        let downstreamMass = 0;
+        graph.forEachInNeighbor(node, child => {
+            downstreamMass += graph.getNodeAttribute(child, 'mass');
+        });
+        graph.setNodeAttribute(node, 'downstreamMass', downstreamMass);
+        let ownMass = graph.getNodeAttribute(node, 'ownMass');
+        graph.setNodeAttribute(node, 'mass', ownMass + downstreamMass);
+    })
+
     let nodes = {};
+    let edges = [];
     links.forEach(link => {
-        link.source = nodes[link.source] || (nodes[link.source] = { name: link.source });
-        link.target = nodes[link.target] || (nodes[link.target] = { name: link.target });
-        link.value = link.metadata.mass + link.metadata.childrenMass
+        edges.push({
+            source: nodes[link.source] || (nodes[link.source] = { name: link.source }),
+            target: nodes[link.target] || (nodes[link.target] = { name: link.target }),
+            value: graph.getNodeAttributes(link.source).mass,
+        })
+    });
+
+    nodes = Object.values(nodes);
+    nodes.forEach(node => {
+        node.metadata = graph.getNodeAttributes(node.name);
     });
 
     return {
-         nodes: Object.values(nodes),
-         links: links
+         nodes: nodes,
+         links: edges
     };
 }

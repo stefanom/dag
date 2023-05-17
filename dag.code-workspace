@@ -5,6 +5,7 @@
 		}
 	],
 	"settings": {
+		"files.autoSave": "off",
 		"[html]": {
 			"editor.tabSize": 2
 		}		
