@@ -2,6 +2,8 @@
 
 Dag is a tool for thought (tft) that helps you think of dependency maps.
 
+Use it directly in your browser at https://stefanom.github.io/dag/
+
 ![Dag Screenshot](https://github.com/stefanom/dag/blob/main/images/dag.png?raw=true)
 
 ## What are dependency maps?
@@ -34,9 +36,10 @@ exploration, tweaking and continuous updating by everyone involved in a project.
 
 ## How do I use it?
 
-TODO: point to the Github Hosted static page when it's available
+Point your browser to https://stefanom.github.io/dag/ then start typing in the 
+text area.
 
-The dependency map is drawn link by link, in the format of
+The dependency map is drawn dependency by dependency, in the format of
 
 > * taskA > taskB [effort|uncertainty]
 
@@ -64,11 +67,15 @@ if you want two tasks to be considered the very same and connect in the chart.
 
 ## How do I save my dependency maps?
 
-Dag doesn't do it for you (at least at this time). You save it anywhere you normally keep notes or documentation or whatever.
+Dag doesn't do it for you (at least at this time). You can copy the text you edited in it and save it anywhere you normally keep notes or documentation or whatever and then paste it back when you need to weak it.
 
 ## How do I run it locally?
 
-Make sure you have `node.js` installed, then type:
+Make sure you have `node.js` installed. The very first time run
+
+> npm install
+
+to install all the dependencies. Then type type:
 
 > npm run dev
 
@@ -77,9 +84,12 @@ make any changes in the `./dev` folder the page reload automagically.
 
 ## How do I package it for release?
 
-Make sure you have `node.js` installed, then type:
+Type:
 
 > npm run release
+
+this will populate the `./docs` folder with the latest version of Dag, which is
+what's served by GitHub at https://stefanom.github.io/dag/
 
 ## Can I help?
 
