@@ -28,8 +28,8 @@ like spreadsheets or on whiteboards.
 
 We tend to avoid continuous planning because the ROI is poor and I feel that this
 is because planning tools are designed to be "asset generators" (as a way for
-producers, project or product managers to talk about "the plan" with others) but 
-instead they should be considered "tools to amplify thought" and encouradge 
+producers, project or product managers to talk about "the plan" with others) but
+instead they should be considered "tools to amplify thought" and encouradge
 exploration, tweaking and continuous updating by everyone involved in a project.
 
 ## How do I use it?
