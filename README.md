@@ -84,3 +84,8 @@ Make sure you have `node.js` installed, then type:
 ## Can I help?
 
 Absolutely, send me a PR or submit a feature request.
+
+## What's left to be done?
+
+* show the difference between mass given to effort vs. mass given to uncertainty
+* highlight the critical path
