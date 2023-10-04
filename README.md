@@ -36,7 +36,7 @@ exploration, tweaking and continuous updating by everyone involved in a project.
 
 ## How do I use it?
 
-Point your browser to https://stefanom.github.io/dag/ then start typing in the 
+Point your browser to https://stefanom.github.io/dag/ then start typing in the
 text area.
 
 The dependency map is drawn dependency by dependency, in the format of

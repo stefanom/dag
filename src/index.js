@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 //import * as d3Sankey from 'd3-sankey-circular';
 import * as d3Sankey from 'd3-sankey';
 import * as marked from 'marked';
+import LZString from 'lz-string';
 import { createGraph, getDagEdges } from './utils';
 
 import 'bulma/bulma.sass';
@@ -20,6 +21,24 @@ function log(obj) {
     if (debug) {
         console.log(JSON.stringify(obj, null, 2));
     }
+}
+
+function loadContent() {
+    const hashValue = window.location.hash.substring(1); // Get the value of the URL after '#'
+    if (hashValue) {
+        const decompressedValue = LZString.decompressFromEncodedURIComponent(hashValue);
+        document.getElementById("inputText").value = decompressedValue;
+    }
+}
+
+function generatePermalink() {
+    const textValue = document.getElementById("inputText").value;
+    const compressedValue = LZString.compressToEncodedURIComponent(textValue);
+    const currentURL = window.location.href.split('#')[0];
+    const permalinkURL = currentURL + '#' + compressedValue;
+    
+    const permalinkElement = document.getElementById("permalink");
+    permalinkElement.href = permalinkURL;
 }
 
 marked.use({
@@ -43,7 +62,7 @@ const sankey = d3Sankey.sankey()
     .nodeWidth(nodeWidth)
     .nodePadding(nodePadding)
     .extent([[padding, padding], [width - padding, height - padding]]);
-
+    
 function updateChart() {
     const inputText = document.getElementById('inputText').value;
 
@@ -91,7 +110,13 @@ function updateChart() {
         .attr("y", d => (d.y1 - d.y0) / 2)
         .attr("dy", ".35em")
         .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end");
+
+    generatePermalink();
 }
 
 document.getElementById('inputText').addEventListener('input', updateChart);
-updateChart();
+
+window.onload = function() {
+    loadContent();
+    updateChart();
+}

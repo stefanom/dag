@@ -1,6 +1,6 @@
 {
   "name": "dag",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Dag is a tool for thought (tft) that helps you think of dependency maps.",
   "private": true,
   "scripts": {
@@ -24,6 +24,7 @@
     "d3-sankey": "^0.12.3",
     "graphology": "^0.25.1",
     "graphology-dag": "^0.2.0",
+    "lz-string": "^1.5.0",
     "marked": "^5.0.2"
   },
   "devDependencies": {
